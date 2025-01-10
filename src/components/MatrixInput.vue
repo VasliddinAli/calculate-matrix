@@ -2,7 +2,7 @@
     <table>
         <tr v-for="(row, i) in localMatrix" :key="i">
             <td v-for="(val, j) in row" :key="j">
-                <input type="number" v-model.number="localMatrix[i][j]" @input="handleInput(i, j)" />
+                <input type="text" v-model.number="localMatrix[i][j]" @input="handleInput(i, j)" />
             </td>
         </tr>
     </table>
