@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+td,
+th {
+    text-align: center;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+}
+
+input {
+    width: 50px;
+    text-align: center;
+    padding: 5px;
+    margin: 0;
+}
+
+.active {
+    background-color: #4CAF50;
+    color: white
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
