@@ -13,7 +13,7 @@
     <button @click="calculate">Hisoblash</button>
     <h2>Natija</h2>
     <p v-if="error" style="color: red;">Notog'ri</p>
-    <table v-else>
+    <table v-else class="result-table">
       <tr v-for="(row, i) in result" :key="i">
         <td v-for="(val, j) in row" :key="j">{{ formatValue(val) }}</td>
       </tr>
@@ -40,10 +40,10 @@ export default {
       this.operation = op;
     },
     updateMatrix1(newMatrix) {
-      this.matrix1 = JSON.parse(JSON.stringify(newMatrix));
+      this.matrix1 = newMatrix;
     },
     updateMatrix2(newMatrix) {
-      this.matrix2 = JSON.parse(JSON.stringify(newMatrix));
+      this.matrix2 = newMatrix;
     },
     calculate() {
       try {
@@ -51,7 +51,7 @@ export default {
         const m1 = this.matrix1;
         const m2 = this.matrix2;
 
-        const fillMatrix = (matrix) => matrix.map(row => row.map(val => val === null ? 0 : val));
+        const fillMatrix = (matrix) => matrix.map(row => row.map(val => (val === null || val === '') ? 0 : val));
 
         const filledM1 = fillMatrix(m1);
         const filledM2 = fillMatrix(m2);
@@ -59,21 +59,28 @@ export default {
         if (this.operation === 'add') {
           if (filledM1.length !== filledM2.length || filledM1[0].length !== filledM2[0].length) throw 'error';
           this.result = filledM1.map((row, i) => row.map((val, j) => val + filledM2[i][j]));
-        }
-        else if (this.operation === 'subtract') {
+        } else if (this.operation === 'subtract') {
           if (filledM1.length !== filledM2.length || filledM1[0].length !== filledM2[0].length) throw 'error';
           this.result = filledM1.map((row, i) => row.map((val, j) => val - filledM2[i][j]));
-        }
-        else if (this.operation === 'scalar') {
+        } else if (this.operation === 'scalar') {
           const scalar = parseFloat(prompt('Songa ko\'paytirish qiymatini kiriting:'));
           if (isNaN(scalar)) throw 'error';
           this.result = filledM1.map(row => row.map(val => val * scalar));
-        }
-        else if (this.operation === 'multiply') {
+        } else if (this.operation === 'multiply') {
           if (filledM1[0].length !== filledM2.length) throw 'error';
-          this.result = filledM1.map(row => filledM2[0].map((_, j) => row.reduce((sum, val, k) => sum + val * filledM2[k][j], 0)));
-        }
-        else if (this.operation === 'divide') {
+
+          // Matritsani matritsaga ko'paytirish
+          this.result = filledM1.map((row) =>
+            filledM2[0].map((_, j) =>
+              row.reduce((sum, val, k) => sum + val * filledM2[k][j], 0)
+            )
+          );
+
+          // NaN yoki 0 qiymatlarini olib tashlash
+          this.result = this.result.map(row =>
+            row.filter(val => !isNaN(val) && val !== 0) // faqat haqiqiy sonlarni ko'rsatish
+          );
+        } else if (this.operation === 'divide') {
           if (filledM1.length !== filledM2.length || filledM1[0].length !== filledM2[0].length) throw 'error';
           this.result = filledM1.map((row, i) => row.map((val, j) => {
             const divisor = filledM2[i][j] === 0 ? 1 : filledM2[i][j];
@@ -84,12 +91,47 @@ export default {
         }
       } catch (e) {
         this.error = true;
+        console.error('Xatolik yuz berdi:', e);
       }
     },
     formatValue(value) {
-      if (value === 0) return '';
+      // Agar qiymat 0 yoki NaN bo'lsa, hech narsa ko'rsatilmaydi
+      if (value === 0 || isNaN(value)) {
+        return '';
+      }
       return value;
     }
   }
 };
 </script>
+
+<style>
+.operations button {
+  margin: 5px;
+}
+
+.operations button.active {
+  background-color: #4caf50;
+  color: white;
+}
+
+.calculate-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #008cba;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.result-table {
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.result-table td {
+  border: 1px solid black;
+  padding: 5px 10px;
+  text-align: center;
+}
+</style>
